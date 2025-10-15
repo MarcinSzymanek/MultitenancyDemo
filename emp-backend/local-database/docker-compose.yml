@@ -1,0 +1,9 @@
+services:
+  dev-db:
+    image: postgres
+    ports:
+      - 5434:5432
+    environment:
+      POSTGRES_USER: empApi
+      POSTGRES_PASSWORD: superSecurePass
+      POSTGRES_DB: nest

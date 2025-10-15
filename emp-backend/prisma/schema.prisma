@@ -1,0 +1,79 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Tenant {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  User      User[]
+
+  @@map("tenants")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  tenantId String
+  tenant   Tenant @relation(fields: [tenantId], references: [id])
+
+  role         Role           @default(USER)
+  firstName    String
+  lastName     String
+  email        String
+  pwdhash      String
+  WorkSchedule WorkSchedule[]
+
+  @@index([tenantId, email])
+  @@map("users")
+}
+
+model WorkSchedule {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  useSameSchedule Boolean @default(true)
+
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id])
+  DailySchedule DailySchedule[]
+
+  @@map("schedules")
+}
+
+model DailySchedule {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  day          Int
+  startHour    Int
+  durationHour Int
+
+  workScheduleId Int
+  workSchedule   WorkSchedule @relation(fields: [workScheduleId], references: [id])
+
+  @@map("dailySchedules")
+}
+
+enum Role {
+  USER
+  ADMIN
+
+  @@map("roles")
+}
