@@ -1,9 +1,15 @@
 {
   "moduleFileExtensions": ["js", "json", "ts"],
-  "rootDir": ".",
+  "rootDir": "C:/Users/nastr/source/repos/MPC/MultitenancyDemo/emp-backend",
   "testEnvironment": "node",
   "testRegex": ".e2e-spec.ts$",
   "transform": {
     "^.+\\.(t|j)s$": "ts-jest"
-  }
+  },
+  "moduleNameMapper": {
+    "^src/(.*)$": "<rootDir>/src/$1",
+    "^generated/prisma$": "<rootDir>/generated/prisma"
+  },
+  "globalTeardown": "./test/jest-e2e-teardown.ts",
+  "setupFiles": ["<rootDir>/test/jest-e2e-setup.ts"]
 }

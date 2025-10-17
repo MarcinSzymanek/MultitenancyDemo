@@ -4,11 +4,9 @@ import {
   HttpException,
   InternalServerErrorException,
   Post,
-  UseGuards,
 } from '@nestjs/common';
-import { AdminGuard } from 'src/common/guards/admin.guard';
 import { AuthService } from './auth.service';
-import { LoginDto, SignupDto } from './dto/auth.dto';
+import { LoginDto } from './dto/auth.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,19 +23,5 @@ export class AuthController {
       }
       throw error;
     }
-  }
-
-  @UseGuards(AdminGuard)
-  @Post('signup')
-  async signUp(@Body() dto: SignupDto) {
-    try {
-      await this.authService.signup(dto);
-    } catch (error) {
-      if (!(error instanceof HttpException)) {
-        throw new InternalServerErrorException();
-      }
-    }
-
-    return 'Signup succesful';
   }
 }

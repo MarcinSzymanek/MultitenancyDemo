@@ -3,6 +3,7 @@ import {
   ExecutionContext,
   Injectable,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { $Enums } from 'generated/prisma';
 import { Observable } from 'rxjs';
@@ -15,8 +16,10 @@ export class AdminGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const req = context.switchToHttp().getRequest<TenantRequest>();
     Logger.debug('GETTING TENANT REQ');
-    Logger.debug(req);
-    if (req.role != $Enums.Role.ADMIN) return false;
+    // Logger.debug(req);
+    console.log(req.role);
+    if (req.role != $Enums.Role.ADMIN)
+      throw new UnauthorizedException('Admin permissions required');
     return true;
   }
 }

@@ -1,0 +1,9 @@
+services:
+  e2e-db:
+    image: postgres
+    ports:
+      - 5436:5432
+    environment:
+      POSTGRES_USER: empTestApi
+      POSTGRES_PASSWORD: superSecurePass
+      POSTGRES_DB: empTestdb

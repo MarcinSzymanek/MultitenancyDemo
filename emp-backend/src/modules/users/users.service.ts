@@ -1,9 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import argon from 'argon2';
+import type { User } from 'generated/prisma';
 import { $Enums } from 'generated/prisma';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { GetUsersDto } from './dto/get-users.dto';
+
+function userToGetUsersDto(user: User): GetUsersDto {
+  return {
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    isAdmin: user.role == $Enums.Role.ADMIN ? true : false,
+  };
+}
 
 @Injectable()
 export class UsersService {
@@ -31,19 +41,24 @@ export class UsersService {
     return user;
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(tenantId: string): Promise<GetUsersDto[]> {
+    const users = await this.prisma.user.findMany({
+      where: { tenantId: tenantId },
+    });
+    const dtos = users.map((user) => userToGetUsersDto(user));
+    console.log(dtos);
+    return dtos;
   }
 
   findOne(id: number) {
     return `This action returns a #${id} user`;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
+  // update(id: number, updateUserDto: UpdateUserDto) {
+  //   return `This action updates a #${id} user`;
+  // }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
+  // remove(id: number) {
+  //   return `This action removes a #${id} user`;
+  // }
 }

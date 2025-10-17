@@ -1,9 +1,14 @@
-import { Module } from '@nestjs/common';
-import { UsersService } from './users.service';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { DataExtractorMiddleware } from 'src/common/middleware/DataExtractor.middleware';
 import { UsersController } from './users.controller';
+import { UsersService } from './users.service';
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService],
 })
-export class UsersModule {}
+export class UsersModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(DataExtractorMiddleware).forRoutes(UsersController);
+  }
+}

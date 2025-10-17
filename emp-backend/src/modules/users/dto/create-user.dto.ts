@@ -28,6 +28,8 @@ export class CreateUserDto {
   password: string;
 }
 
+export class CreateUserApiDto extends OmitType(CreateUserDto, ['tenantId']) {}
+
 export class CreateUserReturn extends OmitType(CreateUserDto, [
   'password',
   'isAdmin',

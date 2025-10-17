@@ -21,8 +21,8 @@ const seedData: CreateTenantDto[] = [
 const prisma = new PrismaClient();
 
 async function main() {
+  if (!prisma) return;
   for (const data of seedData) {
-    if (!prisma) return;
     const tenant = await prisma.tenant.create({
       data: {
         id: data.tenantId,

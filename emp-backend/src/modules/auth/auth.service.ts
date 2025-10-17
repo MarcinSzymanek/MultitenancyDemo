@@ -1,14 +1,10 @@
-import {
-  HttpException,
-  HttpStatus,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
+import { $Enums } from 'generated/prisma';
 import { PrismaService } from '../prisma/prisma.service';
-import { LoginDto, SignupDto } from './dto/auth.dto';
+import { LoginDto } from './dto/auth.dto';
 
 const UserOrPasswordErrorMsg = 'User or password does not match';
 
@@ -26,7 +22,7 @@ export class AuthService {
 
   async login(dto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.prisma.user.findFirst({
-      where: { email: dto.email },
+      where: { email: dto.email, tenantId: dto.tenantId },
     });
     if (user === null)
       throw new HttpException(UserOrPasswordErrorMsg, HttpStatus.FORBIDDEN);
@@ -35,45 +31,19 @@ export class AuthService {
     if (!passwordMatches)
       throw new HttpException(UserOrPasswordErrorMsg, HttpStatus.FORBIDDEN);
 
-    return this.signToken(user.id, user.email);
-  }
-
-  async signup(dto: SignupDto): Promise<{ access_token: string }> {
-    const userFound = await this.prisma.user.findFirst({
-      where: { email: dto.email },
-    });
-    if (userFound !== null)
-      throw new HttpException('User already exists', HttpStatus.CONFLICT);
-
-    const hash = await argon.hash(dto.password);
-
-    const user = await this.prisma.user.create({
-      data: {
-        tenant: {
-          connect: {
-            id: dto.tenantId,
-          },
-        },
-        email: dto.email,
-        pwdhash: hash,
-        firstName: dto.firstName,
-        lastName: dto.lastName,
-      },
-    });
-
-    if (user === null)
-      throw new InternalServerErrorException('Failed to create user');
-
-    return this.signToken(user.id, user.email);
+    return this.signToken(dto.tenantId, user.email, user.role);
   }
 
   async signToken(
-    userId: number,
+    tenantId: string,
     email: string,
-  ): Promise<{ userId: number; access_token: string }> {
+    role: $Enums.Role,
+  ): Promise<{ access_token: string }> {
     const payload = {
-      sub: userId,
+      sub: tenantId,
+      tenantId,
       email,
+      role,
     };
 
     const token = await this.jwt.signAsync(payload, {
@@ -81,6 +51,6 @@ export class AuthService {
       secret: this.jwtSecret,
     });
 
-    return { userId: userId, access_token: token };
+    return { access_token: token };
   }
 }

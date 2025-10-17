@@ -1,18 +1,19 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, Logger, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request } from 'express';
 import { jwtDecode } from 'jwt-decode';
 import { ExtractJwt } from 'passport-jwt';
-import { UserJwtPayload, TenantRequest } from 'src/shared/types/requestTypes';
+import { TenantRequest, UserJwtPayload } from 'src/shared/types/requestTypes';
 
 @Injectable()
-export class UidExtractorMiddleware implements NestMiddleware {
+export class DataExtractorMiddleware implements NestMiddleware {
   use(req: Request, _: Response, next: NextFunction) {
+    Logger.debug('Middleware');
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
     if (!token) {
       next();
       return;
     }
-
+    Logger.debug('Decoding');
     const data = jwtDecode<UserJwtPayload>(token);
     const tenantReq = req as TenantRequest;
     if (data.tenantId) tenantReq.tenantId = data.tenantId;

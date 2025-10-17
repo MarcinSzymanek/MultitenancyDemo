@@ -24,7 +24,6 @@ model Tenant {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -38,6 +37,7 @@ model User {
   pwdhash      String
   WorkSchedule WorkSchedule[]
 
+  @@id([email, tenantId])
   @@index([tenantId, email])
   @@map("users")
 }
@@ -49,8 +49,9 @@ model WorkSchedule {
 
   useSameSchedule Boolean @default(true)
 
-  userId        Int
-  user          User            @relation(fields: [userId], references: [id])
+  tenantId      String
+  userEmail     String
+  user          User            @relation(fields: [userEmail, tenantId], references: [email, tenantId])
   DailySchedule DailySchedule[]
 
   @@map("schedules")
