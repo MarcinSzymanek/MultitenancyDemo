@@ -24,3 +24,5 @@ lerna-debug.log*
 *.tmp
 
 *.code-workspace
+
+.env.*
