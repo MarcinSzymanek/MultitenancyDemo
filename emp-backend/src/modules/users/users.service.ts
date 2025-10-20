@@ -46,7 +46,6 @@ export class UsersService {
       where: { tenantId: tenantId },
     });
     const dtos = users.map((user) => userToGetUsersDto(user));
-    console.log(dtos);
     return dtos;
   }
 

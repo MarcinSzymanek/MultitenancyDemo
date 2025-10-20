@@ -18,6 +18,7 @@ export class AuthController {
       const token = await this.authService.login(dto);
       return token;
     } catch (error) {
+      console.error(error);
       if (!(error instanceof HttpException)) {
         throw new InternalServerErrorException();
       }

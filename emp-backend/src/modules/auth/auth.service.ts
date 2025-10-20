@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { $Enums } from 'generated/prisma';
+import { JWT_SECRET } from 'src/shared/constants/authConstants';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/auth.dto';
 
@@ -15,17 +15,18 @@ export class AuthService {
   constructor(
     private jwt: JwtService,
     private prisma: PrismaService,
-    config: ConfigService,
   ) {
-    this.jwtSecret = config.getOrThrow<string>('JWT_SECRET');
+    this.jwtSecret = JWT_SECRET!;
+    if (!this.jwtSecret) throw new Error('Unable to retrieve jwt secret');
   }
 
   async login(dto: LoginDto): Promise<{ access_token: string }> {
     const user = await this.prisma.user.findFirst({
       where: { email: dto.email, tenantId: dto.tenantId },
     });
-    if (user === null)
+    if (user === null) {
       throw new HttpException(UserOrPasswordErrorMsg, HttpStatus.FORBIDDEN);
+    }
 
     const passwordMatches = await argon.verify(user.pwdhash, dto.password);
     if (!passwordMatches)
