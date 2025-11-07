@@ -41,7 +41,7 @@ const UserOverview = () => {
         <TableCell colSpan={3} className='text-center'>
           <BounceLoader
             color='#3b82f6'
-            className='mx-auto my-8 justify-self-center'
+            className='absolute top-1/2 left-1/2 mx-auto my-8 justify-self-center'
           />
           ;
         </TableCell>

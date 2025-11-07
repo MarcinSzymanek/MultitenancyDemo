@@ -2,9 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as argon from 'argon2';
 import { $Enums } from 'generated/prisma';
-import { JWT_SECRET } from 'src/shared/constants/authConstants';
 import { PrismaService } from '../prisma/prisma.service';
 import { LoginDto } from './dto/auth.dto';
+import { JWT_SECRET } from 'src/shared/constants/authConstants';
 
 const UserOrPasswordErrorMsg = 'User or password does not match';
 
